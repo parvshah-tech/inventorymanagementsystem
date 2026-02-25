@@ -56,7 +56,7 @@ export default {
       }
 
       if (await this.updateCartProduct(payload)) {
-        console.log('Added')
+        // console.log('Added')
       }
     },
   },
