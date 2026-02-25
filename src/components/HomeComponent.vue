@@ -23,12 +23,13 @@ export default {
     }),
   },
 
-  created() {
+  async created() {
     this.fetchProducts()
+    await this.fetchCart()
   },
 
   methods: {
-    ...mapActions(['updateCartProduct']),
+    ...mapActions(['updateCartProduct', 'fetchCart']),
     async fetchProducts(page = 1) {
       try {
         this.isFetching = true
@@ -42,19 +43,22 @@ export default {
         this.isFetching = false
       }
     },
-  },
-  async addToCart(pid, quantity) {
-    const product = this.cartProducts.filter((item) => item.pid === pid).quantity
-    console.log(product)
+    async addToCart(pid, quantity) {
+      const product = this.cartProducts.filter((item) => item.pid === pid)[0]?.quantity
 
-    // const payload = {
-    //   pid: pid,
-    //   quantity: quantity,
-    // }
+      if (product) {
+        quantity += Number(product)
+      }
 
-    // if (await this.updateCartProduct(payload)) {
-    //   console.log('Added')
-    // }
+      const payload = {
+        pid: pid,
+        quantity: quantity,
+      }
+
+      if (await this.updateCartProduct(payload)) {
+        console.log('Added')
+      }
+    },
   },
 }
 </script>
@@ -80,7 +84,7 @@ export default {
             <td>{{ item.price }}</td>
             <td>{{ item.category }}</td>
             <td style="border: none">
-              <button class="add-to-cart-btn" @click="addToCart(item.pid)">Add to cart</button>
+              <button class="add-to-cart-btn" @click="addToCart(item.pid, 1)">Add to cart</button>
             </td>
           </tr>
         </tbody>
