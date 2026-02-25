@@ -23,7 +23,9 @@ export default {
 
   methods: {
     ...mapActions(['updateCartProduct']),
-    async fetchProducts(page = 1) {
+    async fetchProducts() {
+      const page = this.$route.query?.page ?? 1
+
       try {
         this.isFetching = true
         const resp = await axiosInstance.get(`/product_list.php?pn=${page}`)

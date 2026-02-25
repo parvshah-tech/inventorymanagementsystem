@@ -14,28 +14,30 @@ input[type='text'],
 input[type='tel'] {
   width: 100%;
   padding: 10px;
-  border: 1px solid;
+  border: 1px solid white;
   border-radius: 15px;
 }
 
 .btn {
-  font-size: 18px;
-  margin: 12px 0;
-  color: #000;
-  background-color: #9ccae9;
   padding: 10px 25px;
-  border: 1px solid;
+  margin: 12px auto;
+  font-size: 18px;
+  font-size: 18px;
+  color: hsla(160, 100%, 98%, 1);
+  background-color: hsla(160, 100%, 37%, 1);
+  box-shadow: 0px 2px 4px hsla(160, 100%, 37%, 0.2);
   border-radius: 15px;
+  border: 1px solid transparent;
   cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.5s;
+  transition: all 0.15s ease;
 }
 
 .btn:hover {
   background-color: white;
-  border: 1px solid #9ccae9;
-  color: rgba(0, 0, 0, 0.5);
+  color: hsla(160, 100%, 37%, 1);
+  border: 1px solid hsla(160, 100%, 37%, 1);
+  box-shadow: 0px 4px 12px hsla(160, 100%, 37%, 0.2);
+  transform: translateY(-1px) scale(1.05);
 }
 
 .field-error {

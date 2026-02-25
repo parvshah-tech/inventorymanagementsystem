@@ -20,6 +20,16 @@ export default {
       return Math.ceil(this.totalProducts / this.limit)
     },
   },
+  methods: {
+    async changePage(page) {
+      await this.$router.push({
+        query: {
+          page: page,
+        },
+      })
+      this.$emit('fetchData')
+    },
+  },
 }
 </script>
 
@@ -28,7 +38,7 @@ export default {
     <a
       v-for="value in totalPage"
       :key="value"
-      @click="currentPage === value ? '' : $emit('fetchData', value)"
+      @click="currentPage === value ? '' : changePage(value)"
       :class="currentPage === value ? 'active' : ''"
     >
       {{ value }}
