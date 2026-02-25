@@ -1,0 +1,46 @@
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 18px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+input[type='email'],
+input[type='password'],
+input[type='text'],
+input[type='tel'] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid;
+  border-radius: 15px;
+}
+
+.btn {
+  font-size: 18px;
+  margin: 12px 0;
+  color: #000;
+  background-color: #9ccae9;
+  padding: 10px 25px;
+  border: 1px solid;
+  border-radius: 15px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.5s;
+}
+
+.btn:hover {
+  background-color: white;
+  border: 1px solid #9ccae9;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.field-error {
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+  color: red;
+}
