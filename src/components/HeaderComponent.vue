@@ -2,9 +2,12 @@
 import axiosInstance from '@/axiosInstance'
 import Cookies from 'js-cookie'
 import CartComponent from './CartComponent.vue'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
+  created() {
+    this.fetchCart()
+  },
   components: {
     CartComponent,
   },
@@ -22,6 +25,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(['fetchCart']),
     toggleProfileMenu() {
       this.profileActive = !this.profileActive
 
@@ -58,7 +62,7 @@ export default {
             </button>
           </div>
           <div v-if="cartActive" class="cart-content">
-            <CartComponent />
+            <CartComponent @close-cart="toggleCartMenu" />
           </div>
         </div>
         <div class="profile-dropdown">
@@ -107,15 +111,15 @@ export default {
 
 .cart-badge {
   position: absolute;
-  top: -5px;
-  left: -5px;
+  top: -12px;
+  left: -12px;
 
   background-color: hsla(0, 100%, 45%, 1);
   color: white;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
-  min-width: 20px;
-  height: 20px;
+  min-width: 30px;
+  height: 30px;
   padding: 0 4px;
 
   border-radius: 50%;
@@ -226,7 +230,9 @@ export default {
 }
 
 .cart-content {
+  max-height: 500px;
   padding: 12px;
+  padding-top: 0;
   display: block;
   position: absolute;
   right: 0;
@@ -235,7 +241,7 @@ export default {
   border-radius: 15px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
   z-index: 100;
-  overflow: hidden;
+  overflow-y: auto;
   margin-top: 14px;
   border: 1px solid rgba(0, 128, 0, 0.1);
 }

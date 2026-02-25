@@ -1,7 +1,7 @@
 <script>
 import axiosInstance from '@/axiosInstance'
 import PaginationComponent from './PaginationComponent.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -17,19 +17,12 @@ export default {
     }
   },
 
-  computed: {
-    ...mapState({
-      cartProducts: 'cartProducts',
-    }),
-  },
-
   async created() {
     this.fetchProducts()
-    await this.fetchCart()
   },
 
   methods: {
-    ...mapActions(['updateCartProduct', 'fetchCart']),
+    ...mapActions(['updateCartProduct']),
     async fetchProducts(page = 1) {
       try {
         this.isFetching = true
@@ -44,19 +37,13 @@ export default {
       }
     },
     async addToCart(pid, quantity) {
-      const product = this.cartProducts.filter((item) => item.pid === pid)[0]?.quantity
-
-      if (product) {
-        quantity += Number(product)
-      }
-
       const payload = {
         pid: pid,
         quantity: quantity,
       }
 
       if (await this.updateCartProduct(payload)) {
-        // console.log('Added')
+        console.log('Added')
       }
     },
   },
@@ -81,7 +68,7 @@ export default {
           <tr v-for="item in products" :key="item.pid">
             <td>{{ item.pname }}</td>
             <td>{{ item.pdesc }}</td>
-            <td>{{ item.price }}</td>
+            <td>₹{{ item.price }}</td>
             <td>{{ item.category }}</td>
             <td style="border: none">
               <button class="add-to-cart-btn" @click="addToCart(item.pid, 1)">Add to cart</button>

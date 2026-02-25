@@ -2,27 +2,58 @@
 import { mapActions, mapState } from 'vuex'
 
 export default {
+  name: 'CartComponent',
+  emits: ['closeCart'],
   async created() {
+    this.isLoading = true
     await this.fetchCart()
-    console.log(this.cartProducts)
+    this.isLoading = false
+    // console.log(this.cartProducts)
+  },
+
+  data() {
+    return {
+      isLoading: false,
+    }
   },
 
   computed: {
-    ...mapState(['cartProducts', 'totalProducts', 'isLoading', 'cartErrorMsg']),
+    ...mapState(['cartProducts', 'totalProducts', 'cartErrorMsg']),
   },
   methods: {
-    ...mapActions(['fetchCart']),
+    ...mapActions(['fetchCart', 'updateCartProduct', 'clearCart', 'deleteCartProduct']),
+    async update(pid, quantity) {
+      const payload = {
+        pid: pid,
+        quantity: quantity,
+      }
+      if (await this.updateCartProduct(payload)) {
+        console.log('Updated')
+      }
+    },
+    async deleteProduct(pid) {
+      const resp = await this.deleteCartProduct(pid)
+      if (resp.message) {
+        console.log('Deleted')
+      } else {
+        console.log(resp)
+      }
+    },
+    async clear() {
+      await this.clearCart()
+      this.$emit('closeCart')
+    },
   },
 }
 </script>
 
 <template>
-  <h1 v-if="isLoading" style="text-align: center">Loading...</h1>
+  <h1 v-if="isLoading" class="message">Loading...</h1>
   <template v-else-if="cartProducts">
     <div class="cart-header">
       <div></div>
       <h1>Your Cart</h1>
-      <button class="cart-clear-btn" @click="clearCart">Clear Cart</button>
+      <button class="cart-clear-btn" @click="clear">Clear Cart</button>
     </div>
     <div class="cart-body">
       <div v-for="product in cartProducts" class="cart-item" :key="product.pid">
@@ -33,24 +64,49 @@ export default {
         </div>
 
         <div class="quantity-stepper">
-          <button class="qty-btn decrement" aria-label="Decrease quantity">−</button>
-          <span class="qty-input">{{ product.quantity }}</span>
-          <button class="qty-btn increment" aria-label="Increase quantity">+</button>
+          <button
+            class="qty-btn decrement"
+            aria-label="Decrease quantity"
+            @click="update(product.pid, -1)"
+            :disabled="Number(product.quantity) === 1"
+          >
+            −
+          </button>
+          <span class="qty-number">{{ product.quantity }}</span>
+          <button
+            class="qty-btn increment"
+            aria-label="Increase quantity"
+            @click="update(product.pid, 1)"
+          >
+            +
+          </button>
         </div>
-
-        <button class="remove-item-btn" title="Remove Item">
+        <p class="total-price">₹{{ product.total_price }}</p>
+        <button class="remove-item-btn" title="Remove Item" @click="deleteProduct(product.pid)">
           <img src="../assets/images/delete.png" alt="delete" />
         </button>
       </div>
+      <div class="cart-footer">
+        <button class="cart-clear-btn" @click="$emit('closeCart')">Close</button>
+        <button class="checkout-btn">Checkout</button>
+      </div>
     </div>
   </template>
-  <h2 v-else style="text-align: center">{{ cartErrorMsg }}</h2>
+  <h2 v-else class="message">{{ cartErrorMsg }}</h2>
 </template>
 
 <style scoped>
+.message {
+  margin-top: 12px;
+  text-align: center;
+  color: hsla(160, 100%, 20%, 1);
+}
+
 .cart-header {
-  margin: 0 12px;
-  margin-bottom: 12px;
+  position: sticky;
+  top: 0px;
+  padding: 12px 0;
+  background-color: rgba(242, 248, 246, 0.9);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -104,7 +160,7 @@ export default {
 }
 
 .item-price {
-  color: hsla(160, 100%, 37%, 1); /* Your Signature Teal */
+  color: hsla(160, 100%, 37%, 1);
   font-weight: 700;
 }
 
@@ -120,7 +176,7 @@ export default {
   background: none;
   padding: 8px 12px;
   margin: 0 12px;
-  font-size: 18px;
+  font-size: 20px;
   color: hsla(160, 100%, 98%, 1);
   border-radius: 50%;
   border: 1px solid transparent;
@@ -147,8 +203,14 @@ export default {
 }
 
 .qty-number {
-  padding: 0 10px;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.total-price {
+  color: hsla(160, 100%, 37%, 1);
+  font-weight: 700;
+  font-size: 20px;
 }
 
 .remove-item-btn {
@@ -166,5 +228,33 @@ export default {
 .remove-item-btn > img {
   height: 70%;
   width: auto;
+}
+
+.cart-footer {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.checkout-btn {
+  padding: 8px;
+  font-size: 18px;
+  font-size: 18px;
+  color: hsla(160, 100%, 98%, 1);
+  background-color: hsla(160, 100%, 37%, 1);
+  box-shadow: 0px 2px 4px hsla(160, 100%, 37%, 0.2);
+  border-radius: 15px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.checkout-btn:hover {
+  background-color: white;
+  color: hsla(160, 100%, 37%, 1);
+  border: 1px solid hsla(160, 100%, 37%, 1);
+  box-shadow: 0px 4px 12px hsla(160, 100%, 37%, 0.2);
+  transform: translateY(-3px) scale(1.05);
 }
 </style>
