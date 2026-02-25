@@ -7,14 +7,10 @@ export const store = createStore({
       status: 0,
       cartProducts: [],
       totalProducts: 0,
-      isLoading: false,
       cartErrorMsg: '',
     }
   },
   mutations: {
-    setLoading(state, val) {
-      state.isLoading = val
-    },
     setCartProducts(state, data) {
       state.status = data.status
       state.cartProducts = data.products
@@ -28,16 +24,20 @@ export const store = createStore({
   actions: {
     async fetchCart({ commit }) {
       try {
-        commit('setLoading', true)
         const resp = await axiosInstance.get('/add_to_cart.php')
         commit('setCartProducts', resp.data)
       } catch (error) {
         commit('setError', error)
-      } finally {
-        commit('setLoading', false)
       }
     },
     async updateCartProduct({ dispatch }, payload) {
+      const product = store.state.cartProducts?.filter((item) => item.pid === payload.pid)[0]
+        ?.quantity
+
+      if (product) {
+        payload.quantity += Number(product)
+      }
+
       const updateProduct = {
         pid: Number(payload.pid),
         quantity: Number(payload.quantity),
@@ -51,8 +51,21 @@ export const store = createStore({
         return false
       }
     },
-    async deleteCartProduct(pid) {
-      console.log(pid)
+    async deleteCartProduct({ dispatch }, pid) {
+      const payload = {
+        pid: Number(pid),
+      }
+
+      try {
+        const resp = await axiosInstance.delete('/add_to_cart.php', {
+          data: payload,
+        })
+        await dispatch('fetchCart')
+        return resp.data
+      } catch (error) {
+        console.log(error)
+        return error
+      }
     },
     async clearCart(state) {
       try {
