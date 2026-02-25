@@ -67,8 +67,9 @@ export default {
           <button
             class="qty-btn decrement"
             aria-label="Decrease quantity"
-            @click="update(product.pid, -1)"
-            :disabled="Number(product.quantity) === 1"
+            @click="
+              Number(product.quantity) === 1 ? deleteProduct(product.pid) : update(product.pid, -1)
+            "
           >
             −
           </button>
