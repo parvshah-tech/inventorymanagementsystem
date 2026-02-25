@@ -74,7 +74,7 @@ export default {
           </tr>
         </thead>
         <tbody>
-          <!-- <tr v-for="item in products" :key="item.pid">
+          <tr v-for="item in products" :key="item.pid">
             <td>{{ item.pname }}</td>
             <td>{{ item.pdesc }}</td>
             <td>{{ item.price }}</td>
@@ -82,7 +82,7 @@ export default {
             <td style="border: none">
               <button class="add-to-cart-btn" @click="addToCart(item.pid)">Add to cart</button>
             </td>
-          </tr> -->
+          </tr>
         </tbody>
       </table>
       <PaginationComponent
