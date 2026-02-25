@@ -47,10 +47,10 @@ export default {
     const product = this.cartProducts.filter((item) => item.pid === pid).quantity
     console.log(product)
 
-    const payload = {
-      pid: pid,
-      quantity: quantity,
-    }
+    // const payload = {
+    //   pid: pid,
+    //   quantity: quantity,
+    // }
 
     // if (await this.updateCartProduct(payload)) {
     //   console.log('Added')
