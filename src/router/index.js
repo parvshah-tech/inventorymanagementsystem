@@ -20,14 +20,23 @@ const router = createRouter({
       name: 'register',
       component: () => import('@/views/SignupView.vue'),
     },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('@/views/CheckoutView.vue'),
+    },
+    {
+      path: '/orders',
+      name: 'orders',
+      component: () => import('@/views/OrdersView.vue'),
+    },
   ],
 })
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   const isAuthenticated = Cookies.get('token') ? true : false
-  // console.log(isAuthenticated)
 
-  const protectedRoute = ['/']
+  const protectedRoute = ['/', '/checkout', '/orders']
 
   if (protectedRoute.includes(to) && !isAuthenticated) {
     return '/login'

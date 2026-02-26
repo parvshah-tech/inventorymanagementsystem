@@ -2,11 +2,12 @@
 import axiosInstance from '@/axiosInstance'
 import Cookies from 'js-cookie'
 import CartComponent from './CartComponent.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   created() {
     this.fetchCart()
+    this.fetchUser()
   },
   components: {
     CartComponent,
@@ -19,13 +20,17 @@ export default {
   },
 
   computed: {
-    ...mapState({
+    ...mapState('cart', {
       totalCartProducts: 'totalProducts',
+    }),
+    ...mapGetters('user', {
+      avatar: 'avatarLetter',
     }),
   },
 
   methods: {
-    ...mapActions(['fetchCart']),
+    ...mapActions('cart', ['fetchCart']),
+    ...mapActions('user', ['fetchUser']),
     toggleProfileMenu() {
       this.profileActive = !this.profileActive
 
@@ -37,10 +42,9 @@ export default {
       if (this.profileActive) this.profileActive = false
     },
     async logout() {
-      const resp = await axiosInstance.get('/logout.php')
+      await axiosInstance.get('/logout.php')
       Cookies.remove('token')
       window.location.href = '/login'
-      console.log(resp.data)
     },
   },
 }
@@ -67,10 +71,13 @@ export default {
         </div>
         <div class="profile-dropdown">
           <button class="profile-btn" @click="toggleProfileMenu">
-            <img src="../assets/images/user.png" alt="user" />
+            <p class="avatar" v-if="avatar">{{ avatar }}</p>
+            <img src="../assets/images/user.png" alt="user" v-else />
           </button>
           <div v-if="profileActive" class="dropdown-content">
             <a href="/update-profile">Update Profile</a>
+            <div class="divider"></div>
+            <a href="/orders">View Orders</a>
             <div class="divider"></div>
             <a @click="logout" class="logout-link">Logout</a>
           </div>
@@ -179,6 +186,11 @@ export default {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
 }
 
+.avatar {
+  font-size: 1.8rem;
+  text-transform: uppercase;
+}
+
 .profile-btn > img {
   height: 70%;
   width: auto;
@@ -210,6 +222,8 @@ export default {
   text-decoration: none;
   display: block;
   font-size: 14px;
+  border-radius: 0;
+  cursor: pointer;
   transition: background 0.2s;
 }
 
@@ -244,5 +258,16 @@ export default {
   overflow-y: auto;
   margin-top: 14px;
   border: 1px solid rgba(0, 128, 0, 0.1);
+}
+
+.cart-content::-webkit-scrollbar {
+  width: 6px;
+}
+.cart-content::-webkit-scrollbar-thumb {
+  background: hsla(160, 100%, 37%, 0.2);
+  border-radius: 10px;
+}
+.cart-content::-webkit-scrollbar-thumb:hover {
+  background: hsla(160, 100%, 37%, 0.5);
 }
 </style>
