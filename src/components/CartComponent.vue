@@ -8,7 +8,6 @@ export default {
     this.isLoading = true
     await this.fetchCart()
     this.isLoading = false
-    // console.log(this.cartProducts)
   },
 
   data() {
@@ -18,10 +17,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['cartProducts', 'totalProducts', 'cartErrorMsg']),
+    ...mapState('cart', ['cartProducts', 'totalProducts', 'cartErrorMsg']),
   },
   methods: {
-    ...mapActions(['fetchCart', 'updateCartProduct', 'clearCart', 'deleteCartProduct']),
+    ...mapActions('cart', ['fetchCart', 'updateCartProduct', 'clearCart', 'deleteCartProduct']),
     async update(pid, quantity) {
       const payload = {
         pid: pid,
@@ -42,6 +41,11 @@ export default {
     async clear() {
       await this.clearCart()
       this.$emit('closeCart')
+    },
+    checkout() {
+      if (this.cartProducts.length > 0) {
+        window.location.href = '/checkout'
+      }
     },
   },
 }
@@ -89,7 +93,7 @@ export default {
       </div>
       <div class="cart-footer">
         <button class="cart-clear-btn" @click="$emit('closeCart')">Close</button>
-        <button class="checkout-btn">Checkout</button>
+        <button class="checkout-btn" @click="checkout">Checkout</button>
       </div>
     </div>
   </template>
@@ -232,7 +236,7 @@ export default {
 }
 
 .cart-footer {
-  margin-top: 12px;
+  margin-top: 18px;
   display: flex;
   justify-content: space-evenly;
   align-items: center;

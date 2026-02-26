@@ -75,11 +75,9 @@ export default {
         try {
           this.isLoading = true
           const resp = await axiosInstance.post('/register.php', this.user)
-          // console.log(resp.data)
           this.message = resp.data.message
           this.status = resp.data.status
         } catch (error) {
-          // console.log(error)
           this.message = error.error
           this.status = error.status
         } finally {

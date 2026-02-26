@@ -22,7 +22,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['updateCartProduct']),
+    ...mapActions('cart', ['updateCartProduct']),
     async fetchProducts() {
       const page = this.$route.query?.page ?? 1
 
