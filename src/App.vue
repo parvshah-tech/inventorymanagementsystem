@@ -15,4 +15,12 @@ import { RouterView } from 'vue-router'
   padding: 18px;
   border-radius: 15px;
 }
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
 </style>

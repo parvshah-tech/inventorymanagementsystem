@@ -9,7 +9,9 @@ export default {
 </script>
 
 <template>
-  <div class="container">
-    <SignupComponent />
-  </div>
+  <main>
+    <div class="container">
+      <SignupComponent />
+    </div>
+  </main>
 </template>

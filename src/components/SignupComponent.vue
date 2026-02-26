@@ -75,8 +75,9 @@ export default {
         try {
           this.isLoading = true
           const resp = await axiosInstance.post('/register.php', this.user)
-          this.message = resp.data.message
+          this.message = resp.data.message + ', Redirecting to login...'
           this.status = resp.data.status
+          setTimeout(() => (window.location.href = '/login'), 3000)
         } catch (error) {
           this.message = error.error
           this.status = error.status
@@ -89,8 +90,8 @@ export default {
     },
   },
   computed: {
-    messageColor() {
-      return this.status === 200 ? 'green' : 'red'
+    messageType() {
+      return this.status === 200 ? 'success' : 'error'
     },
     buttonText() {
       return this.isLoading ? 'Registering...' : 'Register'
@@ -165,22 +166,18 @@ export default {
       </p>
     </div>
     <div style="text-align: center">
+      <div v-if="message" :class="['status-alert', messageType]">
+        <p class="status-text">{{ message }}</p>
+      </div>
       <button type="submit" :disabled="isLoading" class="btn">
         {{ buttonText }}
       </button>
-      <p v-if="message !== ''" class="message" :style="{ color: messageColor }">
-        {{ message }}
-      </p>
       <p>Already have an account, <RouterLink to="/login">Login</RouterLink></p>
     </div>
   </form>
 </template>
 
 <style scoped>
-.message {
-  font-size: 18px;
-}
-
 .name-group {
   display: flex;
   justify-content: space-between;

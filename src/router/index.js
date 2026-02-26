@@ -26,6 +26,11 @@ const router = createRouter({
       component: () => import('@/views/CheckoutView.vue'),
     },
     {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/views/ProfileView.vue'),
+    },
+    {
       path: '/orders',
       name: 'orders',
       component: () => import('@/views/OrdersView.vue'),
@@ -36,7 +41,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const isAuthenticated = Cookies.get('token') ? true : false
 
-  const protectedRoute = ['/', '/checkout', '/orders']
+  const protectedRoute = ['/', '/checkout', '/orders', '/profile']
 
   if (protectedRoute.includes(to) && !isAuthenticated) {
     return '/login'

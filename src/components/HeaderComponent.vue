@@ -75,7 +75,7 @@ export default {
             <img src="../assets/images/user.png" alt="user" v-else />
           </button>
           <div v-if="profileActive" class="dropdown-content">
-            <a href="/update-profile">Update Profile</a>
+            <a href="/profile">Update Profile</a>
             <div class="divider"></div>
             <a href="/orders">View Orders</a>
             <div class="divider"></div>

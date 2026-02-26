@@ -44,9 +44,9 @@ const actions = {
   },
   async updateUser({ dispatch, state }, payload) {
     try {
-      await axiosInstance.post('/update_profile.php')
+      const resp = await axiosInstance.post('/update_profile.php', payload)
       await dispatch('fetchUser')
-      return true
+      return resp.data
     } catch (error) {
       console.log(error)
       return false
