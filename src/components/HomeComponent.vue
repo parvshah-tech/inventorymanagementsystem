@@ -54,8 +54,8 @@ export default {
 
 <template>
   <div class="table-container">
-    <h1 v-if="isFetching">Loading...</h1>
-    <template v-else-if="products.length > 0">
+    <h1 v-if="isFetching">Loading products...</h1>
+    <template v-else-if="products?.length > 0">
       <table>
         <thead>
           <tr>

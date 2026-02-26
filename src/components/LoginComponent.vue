@@ -60,8 +60,8 @@ export default {
     },
   },
   computed: {
-    messageColor() {
-      return this.status === 200 ? 'green' : 'red'
+    messageType() {
+      return this.status === 200 ? 'success' : 'error'
     },
     buttonText() {
       return this.isLoading ? 'Logging...' : 'Login'
@@ -94,20 +94,44 @@ export default {
       </p>
     </div>
     <div style="text-align: center">
+      <div v-if="message !== ''" :class="['status-alert', messageType]">
+        <p class="status-text">{{ message }}</p>
+      </div>
       <button type="submit" :disabled="isLoading" class="btn">
         {{ buttonText }}
       </button>
-      <p v-if="message !== ''" class="message" :style="{ color: messageColor }">
-        {{ message }}
-      </p>
       <p>Don't have an account, <RouterLink to="/register">Register</RouterLink></p>
     </div>
   </form>
 </template>
 
 <style scoped>
-.message {
-  font-size: 18px;
+.status-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border-left: 4px solid transparent;
+}
+
+.status-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-alert.success {
+  background-color: hsla(160, 100%, 37%, 0.1);
+  color: hsla(160, 100%, 25%, 1);
+  border-left-color: hsla(160, 100%, 37%, 1);
+}
+
+.status-alert.error {
+  background-color: hsla(0, 100%, 45%, 0.05);
+  color: hsla(0, 100%, 45%, 1);
+  border-left-color: hsla(0, 100%, 45%, 1);
 }
 
 .name-group {
