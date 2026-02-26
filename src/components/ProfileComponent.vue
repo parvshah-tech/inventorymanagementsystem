@@ -37,15 +37,15 @@ export default {
     validate() {
       let isValid = true
 
-      if (this.user.fname === '' || !this.user.fname) {
+      if (this.user.fname.trim() === '' || !this.user.fname) {
         this.error.fname = 'First name required'
         isValid = false
       }
-      if (this.user.lname === '' || !this.user.lname) {
+      if (this.user.lname.trim() === '' || !this.user.lname) {
         this.error.lname = 'Last name required'
         isValid = false
       }
-      if (this.user.phone === '' || !this.user.phone) {
+      if (this.user.phone.trim() === '' || !this.user.phone) {
         this.error.phone = 'Phone No. required'
         isValid = false
       } else if (!/[0-9]{10}/.test(this.user.phone) || /[a-zA-Z]+/.test(this.user.phone)) {
@@ -85,11 +85,11 @@ export default {
           if (resp.message) {
             this.message = resp.message
             this.messageType = 'success'
+            this.cancel()
           } else {
             this.message = resp.error ?? ''
             this.messageType = 'error'
           }
-          this.cancel()
         }
       }
     },
