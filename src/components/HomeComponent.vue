@@ -23,42 +23,29 @@ export default {
   },
 
   watch: {
-    async filterValue(newVal) {
-      this.isUpdating = true
-      const sort = this.$route.query?.sort
-      const q = {
-        page: 1,
-      }
-      if (sort || sort !== '') {
-        q.sort = sort
-      }
-      if (newVal !== '') {
-        q.filter = newVal
-      }
+    async filterValue() {
       await this.$router.push({
-        query: q,
+        query: {
+          page: 1,
+        },
       })
-
-      await this.fetchProducts(true)
+      await this.fetchProducts()
     },
   },
 
   async created() {
     await this.fetchProducts()
-    this.filterValue = this.$route.query?.filter ?? ''
-    this.sortValue = this.$route.query?.sort ?? ''
   },
 
   methods: {
     ...mapActions('cart', ['updateCartProduct']),
     async fetchProducts(pagination = false) {
       const page = this.$route.query?.page ?? 1
-      const filter = (this.$route.query.filter && '&filter=' + this.$route.query?.filter) ?? ''
-      const sort =
-        (this.$route.query.sort && '&sort=' + this.$route.query?.sort + '&desc=' + this.desc) ?? ''
+      const filter = this.filterValue !== '' ? '&filter=' + this.filterValue : ''
+      const sort = this.sortValue !== '' ? '&sort=' + this.sortValue + '&desc=' + this.desc : ''
 
       try {
-        if (!filter || !page || !sort) {
+        if (filter === '' && sort === '') {
           if (!pagination && !this.isUpdating) {
             this.isFetching = true
           } else {
@@ -96,24 +83,7 @@ export default {
         this.sortValue = sortBy
       }
 
-      if (this.filterValue === '') {
-        await this.$router.push({
-          query: {
-            page: 1,
-            sort: this.sortValue,
-          },
-        })
-      } else {
-        await this.$router.push({
-          query: {
-            page: 1,
-            filter: this.filterValue,
-            sort: this.sortValue,
-          },
-        })
-      }
-
-      await this.fetchProducts(true)
+      await this.fetchProducts()
     },
   },
 }
