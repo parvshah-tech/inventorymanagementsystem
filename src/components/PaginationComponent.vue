@@ -23,22 +23,23 @@ export default {
   methods: {
     async changePage(page) {
       const filter = this.$route.query?.filter
+      const sort = this.$route.query?.sort
 
-      if (!filter || filter === '') {
-        await this.$router.push({
-          query: {
-            page: page,
-          },
-        })
-      } else {
-        await this.$router.push({
-          query: {
-            page: page,
-            filter: filter,
-          },
-        })
+      const q = {
+        page: page,
       }
-      this.$emit('fetchData')
+
+      if (filter || filter !== '') {
+        q.filter = filter
+      }
+
+      if (sort || sort !== '') {
+        q.sort = sort
+      }
+      await this.$router.push({
+        query: q,
+      })
+      this.$emit('fetchData', true)
     },
   },
 }
@@ -59,8 +60,11 @@ export default {
 
 <style scoped>
 .pagination-container {
+  max-width: 1000px;
+  margin: 0 auto;
   margin-top: 32px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 18px;

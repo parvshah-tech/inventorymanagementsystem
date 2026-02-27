@@ -17,43 +17,57 @@ export default {
       isFetching: false,
       isUpdating: false,
       filterValue: '',
+      sortValue: '',
+      desc: 0,
     }
   },
 
   watch: {
     async filterValue(newVal) {
       this.isUpdating = true
-      if (newVal !== '') {
-        await this.$router.push({
-          query: {
-            filter: newVal,
-          },
-        })
-      } else {
-        await this.$router.push('/')
+      const sort = this.$route.query?.sort
+      const q = {
+        page: 1,
       }
-      this.isUpdating = true
-      await this.fetchProducts()
-      this.isUpdating = false
+      if (sort || sort !== '') {
+        q.sort = sort
+      }
+      if (newVal !== '') {
+        q.filter = newVal
+      }
+      await this.$router.push({
+        query: q,
+      })
+
+      await this.fetchProducts(true)
     },
   },
 
   async created() {
     await this.fetchProducts()
-    this.filterValue = this.$route.query?.filter
+    this.filterValue = this.$route.query?.filter ?? ''
+    this.sortValue = this.$route.query?.sort ?? ''
   },
 
   methods: {
     ...mapActions('cart', ['updateCartProduct']),
-    async fetchProducts() {
+    async fetchProducts(pagination = false) {
       const page = this.$route.query?.page ?? 1
-      const filter = this.$route.query.filter && '&filter=' + this.$route.query?.filter
+      const filter = (this.$route.query.filter && '&filter=' + this.$route.query?.filter) ?? ''
+      const sort =
+        (this.$route.query.sort && '&sort=' + this.$route.query?.sort + '&desc=' + this.desc) ?? ''
 
       try {
-        if (!filter) {
-          this.isFetching = true
+        if (!filter || !page || !sort) {
+          if (!pagination && !this.isUpdating) {
+            this.isFetching = true
+          } else {
+            this.isUpdating = true
+          }
+        } else {
+          this.isUpdating = true
         }
-        const resp = await axiosInstance.get(`/product_list.php?pn=${page}${filter}`)
+        const resp = await axiosInstance.get(`/product_list.php?pn=${page}${filter}${sort}`)
         this.products = resp.data.products
         this.totalProducts = Number(resp.data.count)
         this.currentPage = Number(resp.data.current_page)
@@ -61,6 +75,7 @@ export default {
         console.log(error)
       } finally {
         this.isFetching = false
+        this.isUpdating = false
       }
     },
     async addToCart(pid, quantity) {
@@ -73,13 +88,40 @@ export default {
         console.log('Added')
       }
     },
+    async sortProducts(sortBy) {
+      if (sortBy === this.sortValue) {
+        this.desc = Number(!this.desc)
+      } else {
+        this.desc = 0
+        this.sortValue = sortBy
+      }
+
+      if (this.filterValue === '') {
+        await this.$router.push({
+          query: {
+            page: 1,
+            sort: this.sortValue,
+          },
+        })
+      } else {
+        await this.$router.push({
+          query: {
+            page: 1,
+            filter: this.filterValue,
+            sort: this.sortValue,
+          },
+        })
+      }
+
+      await this.fetchProducts(true)
+    },
   },
 }
 </script>
 
 <template>
   <div class="table-container">
-    <h1 v-if="isFetching">Loading products...</h1>
+    <h1 v-if="isFetching && !isUpdating">Loading products...</h1>
     <template v-else-if="products?.length > 0">
       <select name="filter" id="filter" v-model="filterValue">
         <option value="">Category</option>
@@ -90,9 +132,25 @@ export default {
       <table>
         <thead>
           <tr>
-            <th>Name</th>
+            <th>
+              <button class="sort-btn" @click="sortProducts('pname')">
+                Name
+                <span v-if="sortValue === 'pname'">
+                  <span v-if="!desc">&uArr;</span>
+                  <span v-else>&dArr;</span>
+                </span>
+              </button>
+            </th>
             <th>Description</th>
-            <th>Price</th>
+            <th>
+              <button class="sort-btn" @click="sortProducts('price')">
+                Price
+                <span v-if="sortValue === 'price'">
+                  <span v-if="!desc">&uArr;</span>
+                  <span v-else>&dArr;</span>
+                </span>
+              </button>
+            </th>
             <th>Category</th>
             <th style="border: none"></th>
           </tr>
@@ -113,13 +171,14 @@ export default {
         </tbody>
       </table>
       <PaginationComponent
+        v-if="!isUpdating"
         :total-products="totalProducts"
         :limit="limit"
         @fetch-data="fetchProducts"
         :current-page="currentPage"
       />
     </template>
-    <h1 v-else>No Products Found!</h1>
+    <h1 v-else-if="!isFetching && !isUpdating">No Products Found!</h1>
   </div>
 </template>
 
@@ -174,6 +233,17 @@ table {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.sort-btn {
+  background: none;
+  border: none;
+  color: white;
+  text-align: left;
+  font-weight: 600;
+  padding: 12px;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 th {
