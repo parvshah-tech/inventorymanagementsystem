@@ -48,7 +48,7 @@ export default {
           this.message = resp.data.message
           this.status = resp.data.status
           Cookies.set('token', resp.data.token)
-          window.location.href = '/'
+          this.$router.push('/')
           this.user = {}
         } catch (error) {
           this.message = error.error

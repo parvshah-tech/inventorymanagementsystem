@@ -44,7 +44,7 @@ export default {
     },
     checkout() {
       if (this.cartProducts.length > 0) {
-        window.location.href = '/checkout'
+        this.$router.push('/checkout')
       }
     },
   },

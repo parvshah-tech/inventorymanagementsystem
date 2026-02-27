@@ -22,20 +22,10 @@ export default {
   },
   methods: {
     async changePage(page) {
-      const filter = this.$route.query?.filter
-      const sort = this.$route.query?.sort
-
       const q = {
         page: page,
       }
 
-      if (filter || filter !== '') {
-        q.filter = filter
-      }
-
-      if (sort || sort !== '') {
-        q.sort = sort
-      }
       await this.$router.push({
         query: q,
       })

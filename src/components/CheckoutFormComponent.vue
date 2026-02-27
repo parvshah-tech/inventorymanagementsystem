@@ -20,7 +20,7 @@ export default {
       if (this.address === '' || !this.address) {
         this.error = 'Address required'
       } else if (this.address.length < 10) {
-        this.error = 'Enter a valid address'
+        this.error = 'Address length must be greater than 10'
       } else {
         const payload = {
           address: this.address,
