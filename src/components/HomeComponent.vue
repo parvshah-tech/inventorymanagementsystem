@@ -11,24 +11,63 @@ export default {
     return {
       products: [],
       totalProducts: 0,
+      limit: 5,
       currentPage: 1,
       error: '',
       isFetching: false,
+      isUpdating: false,
+      filterValue: '',
+      sortValue: '',
+      desc: 0,
     }
   },
 
+  watch: {
+    async filterValue(newVal) {
+      this.isUpdating = true
+      const sort = this.$route.query?.sort
+      const q = {
+        page: 1,
+      }
+      if (sort || sort !== '') {
+        q.sort = sort
+      }
+      if (newVal !== '') {
+        q.filter = newVal
+      }
+      await this.$router.push({
+        query: q,
+      })
+
+      await this.fetchProducts(true)
+    },
+  },
+
   async created() {
-    this.fetchProducts()
+    await this.fetchProducts()
+    this.filterValue = this.$route.query?.filter ?? ''
+    this.sortValue = this.$route.query?.sort ?? ''
   },
 
   methods: {
     ...mapActions('cart', ['updateCartProduct']),
-    async fetchProducts() {
+    async fetchProducts(pagination = false) {
       const page = this.$route.query?.page ?? 1
+      const filter = (this.$route.query.filter && '&filter=' + this.$route.query?.filter) ?? ''
+      const sort =
+        (this.$route.query.sort && '&sort=' + this.$route.query?.sort + '&desc=' + this.desc) ?? ''
 
       try {
-        this.isFetching = true
-        const resp = await axiosInstance.get(`/product_list.php?pn=${page}`)
+        if (!filter || !page || !sort) {
+          if (!pagination && !this.isUpdating) {
+            this.isFetching = true
+          } else {
+            this.isUpdating = true
+          }
+        } else {
+          this.isUpdating = true
+        }
+        const resp = await axiosInstance.get(`/product_list.php?pn=${page}${filter}${sort}`)
         this.products = resp.data.products
         this.totalProducts = Number(resp.data.count)
         this.currentPage = Number(resp.data.current_page)
@@ -36,6 +75,7 @@ export default {
         console.log(error)
       } finally {
         this.isFetching = false
+        this.isUpdating = false
       }
     },
     async addToCart(pid, quantity) {
@@ -48,26 +88,78 @@ export default {
         console.log('Added')
       }
     },
+    async sortProducts(sortBy) {
+      if (sortBy === this.sortValue) {
+        this.desc = Number(!this.desc)
+      } else {
+        this.desc = 0
+        this.sortValue = sortBy
+      }
+
+      if (this.filterValue === '') {
+        await this.$router.push({
+          query: {
+            page: 1,
+            sort: this.sortValue,
+          },
+        })
+      } else {
+        await this.$router.push({
+          query: {
+            page: 1,
+            filter: this.filterValue,
+            sort: this.sortValue,
+          },
+        })
+      }
+
+      await this.fetchProducts(true)
+    },
   },
 }
 </script>
 
 <template>
   <div class="table-container">
-    <h1 v-if="isFetching">Loading products...</h1>
+    <h1 v-if="isFetching && !isUpdating">Loading products...</h1>
     <template v-else-if="products?.length > 0">
+      <select name="filter" id="filter" v-model="filterValue">
+        <option value="">Category</option>
+        <option value="games">Games</option>
+        <option value="study">Study</option>
+        <option value="sports">Sports</option>
+      </select>
       <table>
         <thead>
           <tr>
-            <th>Name</th>
+            <th>
+              <button class="sort-btn" @click="sortProducts('pname')">
+                Name
+                <span v-if="sortValue === 'pname'">
+                  <span v-if="!desc">&uArr;</span>
+                  <span v-else>&dArr;</span>
+                </span>
+              </button>
+            </th>
             <th>Description</th>
-            <th>Price</th>
+            <th>
+              <button class="sort-btn" @click="sortProducts('price')">
+                Price
+                <span v-if="sortValue === 'price'">
+                  <span v-if="!desc">&uArr;</span>
+                  <span v-else>&dArr;</span>
+                </span>
+              </button>
+            </th>
             <th>Category</th>
             <th style="border: none"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in products" :key="item.pid">
+          <tr v-if="isUpdating">
+            <td colspan="5"><h1>Loading...</h1></td>
+          </tr>
+          <tr v-else v-for="item in products" :key="item.pid">
             <td>{{ item.pname }}</td>
             <td>{{ item.pdesc }}</td>
             <td>₹{{ item.price }}</td>
@@ -79,13 +171,14 @@ export default {
         </tbody>
       </table>
       <PaginationComponent
+        v-if="!isUpdating"
         :total-products="totalProducts"
-        :limit="5"
+        :limit="limit"
         @fetch-data="fetchProducts"
         :current-page="currentPage"
       />
     </template>
-    <h1 v-else>No Products Found!</h1>
+    <h1 v-else-if="!isFetching && !isUpdating">No Products Found!</h1>
   </div>
 </template>
 
@@ -97,10 +190,38 @@ export default {
   border-radius: 12px;
 }
 
-.table-container > h1 {
+.table-container > h1,
+tbody h1 {
   text-align: center;
   color: hsla(160, 100%, 20%, 1);
   margin-bottom: 20px;
+}
+
+select#filter {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 20px 5%; /* Aligns with the 90% width table */
+  padding: 10px 15px;
+  font-size: 16px;
+  color: hsla(160, 100%, 20%, 1);
+  background-color: white;
+  border: 2px solid hsla(160, 100%, 37%, 1);
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+select#filter:focus {
+  box-shadow: 0 0 0 3px hsla(160, 100%, 37%, 0.2);
+  border-color: hsla(160, 100%, 25%, 1);
+}
+
+select#filter option {
+  background-color: white;
+  color: hsla(160, 40%, 15%, 1);
+  padding: 10px;
 }
 
 table {
@@ -112,6 +233,17 @@ table {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.sort-btn {
+  background: none;
+  border: none;
+  color: white;
+  text-align: left;
+  font-weight: 600;
+  padding: 12px;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 th {
