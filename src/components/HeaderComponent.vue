@@ -44,7 +44,7 @@ export default {
     async logout() {
       await axiosInstance.get('/logout.php')
       Cookies.remove('token')
-      window.location.href = '/login'
+      this.$router.push('/login')
     },
   },
 }

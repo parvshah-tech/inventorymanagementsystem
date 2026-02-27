@@ -77,7 +77,7 @@ export default {
           const resp = await axiosInstance.post('/register.php', this.user)
           this.message = resp.data.message + ', Redirecting to login...'
           this.status = resp.data.status
-          setTimeout(() => (window.location.href = '/login'), 3000)
+          this.$router.push('/login')
         } catch (error) {
           this.message = error.error
           this.status = error.status
