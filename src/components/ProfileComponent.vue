@@ -31,6 +31,16 @@ export default {
   computed: {
     ...mapState('user', ['fname', 'lname', 'email', 'phone']),
     ...mapGetters('user', ['avatarLetter']),
+    checkChanges() {
+      if (
+        this.user.fname === this.fname &&
+        this.user.lname === this.lname &&
+        this.user.phone === this.phone
+      ) {
+        return true
+      }
+      return false
+    },
   },
   methods: {
     ...mapActions('user', ['fetchUser', 'updateUser']),
@@ -69,27 +79,19 @@ export default {
     },
     async update() {
       if (this.validate()) {
-        if (
-          this.user.fname === this.fname &&
-          this.user.lname === this.lname &&
-          this.user.phone === this.phone
-        ) {
-          console.log('No request')
+        const payload = {
+          fname: this.user.fname,
+          lname: this.user.lname,
+          phone: this.user.phone,
+        }
+        const resp = await this.updateUser(payload)
+        if (resp.message) {
+          this.message = resp.message
+          this.messageType = 'success'
+          this.cancel()
         } else {
-          const payload = {
-            fname: this.user.fname,
-            lname: this.user.lname,
-            phone: this.user.phone,
-          }
-          const resp = await this.updateUser(payload)
-          if (resp.message) {
-            this.message = resp.message
-            this.messageType = 'success'
-            this.cancel()
-          } else {
-            this.message = resp.error ?? ''
-            this.messageType = 'error'
-          }
+          this.message = resp.error ?? ''
+          this.messageType = 'error'
         }
       }
     },
@@ -174,7 +176,7 @@ export default {
         </div>
         <div v-if="isEditing" class="button-group">
           <button type="button" class="btn-cancel" @click="cancel">Cancel</button>
-          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="submit" class="btn-save" :disabled="checkChanges">Save Changes</button>
         </div>
         <div v-else>
           <button type="button" class="btn-edit" @click="toggleEdit">Edit Profile</button>
