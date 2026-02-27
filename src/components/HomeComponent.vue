@@ -11,7 +11,7 @@ export default {
     return {
       products: [],
       totalProducts: 0,
-      limit: 5,
+      limit: 10,
       currentPage: 1,
       error: '',
       isFetching: false,
@@ -31,6 +31,14 @@ export default {
       })
       await this.fetchProducts()
     },
+    async limit() {
+      await this.$router.push({
+        query: {
+          page: 1,
+        },
+      })
+      await this.fetchProducts()
+    },
   },
 
   async created() {
@@ -41,8 +49,10 @@ export default {
     ...mapActions('cart', ['updateCartProduct']),
     async fetchProducts(pagination = false) {
       const page = this.$route.query?.page ?? 1
+      const newLimit = this.limit !== 0 ? '&limit=' + this.limit : ''
       const filter = this.filterValue !== '' ? '&filter=' + this.filterValue : ''
-      const sort = this.sortValue !== '' ? '&sort=' + this.sortValue + '&desc=' + this.desc : ''
+      const sortDir = this.desc === 0 ? 'ASC' : 'DESC'
+      const sort = this.sortValue !== '' ? '&sort=' + this.sortValue + '&sort_dir=' + sortDir : ''
 
       try {
         if (filter === '' && sort === '') {
@@ -54,7 +64,9 @@ export default {
         } else {
           this.isUpdating = true
         }
-        const resp = await axiosInstance.get(`/product_list.php?pn=${page}${filter}${sort}`)
+        const resp = await axiosInstance.get(
+          `/product_list.php?pn=${page}${newLimit}${filter}${sort}`,
+        )
         this.products = resp.data.products
         this.totalProducts = Number(resp.data.count)
         this.currentPage = Number(resp.data.current_page)
@@ -93,12 +105,21 @@ export default {
   <div class="table-container">
     <h1 v-if="isFetching && !isUpdating">Loading products...</h1>
     <template v-else-if="products?.length > 0">
-      <select name="filter" id="filter" v-model="filterValue">
-        <option value="">Category</option>
-        <option value="games">Games</option>
-        <option value="study">Study</option>
-        <option value="sports">Sports</option>
-      </select>
+      <div class="option-container">
+        <select name="limit" id="limit" v-model="limit">
+          <option :value="5">5</option>
+          <option :value="10">10</option>
+          <option :value="15">15</option>
+          <option :value="20">20</option>
+          <option :value="25">25</option>
+        </select>
+        <select name="filter" id="filter" v-model="filterValue">
+          <option value="">Category</option>
+          <option value="games">Games</option>
+          <option value="study">Study</option>
+          <option value="sports">Sports</option>
+        </select>
+      </div>
       <table>
         <thead>
           <tr>
@@ -167,10 +188,17 @@ tbody h1 {
   margin-bottom: 20px;
 }
 
-select#filter {
+.option-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+select#filter,
+select#limit {
   display: block;
   width: fit-content;
-  margin: 0 auto 20px 5%; /* Aligns with the 90% width table */
+  margin: 0 auto 20px 5%;
   padding: 10px 15px;
   font-size: 16px;
   color: hsla(160, 100%, 20%, 1);
@@ -183,12 +211,18 @@ select#filter {
   transition: all 0.2s ease;
 }
 
-select#filter:focus {
+select#filter {
+  margin: 0 5% 20px auto;
+}
+
+select#filter:focus,
+select#limit:focus {
   box-shadow: 0 0 0 3px hsla(160, 100%, 37%, 0.2);
   border-color: hsla(160, 100%, 25%, 1);
 }
 
-select#filter option {
+select#filter option,
+select#limit option {
   background-color: white;
   color: hsla(160, 40%, 15%, 1);
   padding: 10px;
