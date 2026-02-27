@@ -22,11 +22,22 @@ export default {
   },
   methods: {
     async changePage(page) {
-      await this.$router.push({
-        query: {
-          page: page,
-        },
-      })
+      const filter = this.$route.query?.filter
+
+      if (!filter || filter === '') {
+        await this.$router.push({
+          query: {
+            page: page,
+          },
+        })
+      } else {
+        await this.$router.push({
+          query: {
+            page: page,
+            filter: filter,
+          },
+        })
+      }
       this.$emit('fetchData')
     },
   },
