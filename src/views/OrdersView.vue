@@ -1,5 +1,11 @@
+<script setup lang="ts">
+import HeaderComponent from '@/components/HeaderComponent.vue'
+import ViewOrderComponent from '@/components/ViewOrderComponent.vue'
+</script>
+
 <template>
   <main>
-    <h1>Orders</h1>
+    <HeaderComponent />
+    <ViewOrderComponent />
   </main>
 </template>

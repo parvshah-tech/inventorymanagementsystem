@@ -37,7 +37,7 @@ export default {
           page: 1,
         },
       })
-      await this.fetchProducts()
+      await this.fetchProducts(true)
     },
   },
 
