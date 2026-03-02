@@ -53,6 +53,7 @@ export default {
 
   methods: {
     ...mapActions('cart', ['updateCartProduct']),
+    ...mapActions('toast', ['triggerToast']),
     async fetchProducts(pagination = false) {
       const page = this.$route.query?.page ?? 1
       const newLimit = this.limit !== 0 ? '&limit=' + this.limit : ''
@@ -78,6 +79,10 @@ export default {
         this.currentPage = Number(resp.data.current_page)
       } catch (error) {
         console.log(error)
+        this.triggerToast({
+          message: error.error,
+          color: 'error',
+        })
       } finally {
         this.isFetching = false
         this.isUpdating = false
@@ -90,7 +95,11 @@ export default {
       }
 
       if (await this.updateCartProduct(payload)) {
-        console.log('Added')
+        this.triggerToast({
+          message: 'Added to cart',
+          color: 'success',
+          timeout: 800,
+        })
       }
     },
     async sortProducts(sortBy) {

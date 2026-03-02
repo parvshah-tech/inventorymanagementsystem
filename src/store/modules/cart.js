@@ -53,6 +53,10 @@ const actions = {
       return true
     } catch (error) {
       console.log(error)
+      this.triggerToast({
+        message: error.error,
+        color: 'error',
+      })
       return false
     } finally {
       commit('setLoading', false)
@@ -72,6 +76,10 @@ const actions = {
       return resp.data
     } catch (error) {
       console.log(error)
+      this.triggerToast({
+        message: error.error,
+        color: 'error',
+      })
       return error
     } finally {
       commit('setLoading', false)

@@ -1,6 +1,7 @@
 <script>
 import axiosInstance from '../axiosInstance'
 import '../assets/auth.css'
+import { mapActions } from 'vuex'
 
 export default {
   data() {
@@ -21,13 +22,13 @@ export default {
         pwd: '',
         confirm_pwd: '',
       },
-      message: '',
       status: 0,
       isLoading: false,
     }
   },
 
   methods: {
+    ...mapActions('toast', ['triggerToast']),
     validate() {
       let isValid = true
       if (this.user.fname === '' || !this.user.fname) {
@@ -69,18 +70,23 @@ export default {
     },
     async register() {
       this.error = {}
-      this.message = ''
 
       if (this.validate()) {
         try {
           this.isLoading = true
           const resp = await axiosInstance.post('/register.php', this.user)
-          this.message = resp.data.message + ', Redirecting to login...'
           this.status = resp.data.status
+          this.triggerToast({
+            message: 'Registered successfully',
+            color: 'success',
+          })
           this.$router.push('/login')
         } catch (error) {
-          this.message = error.error
           this.status = error.status
+          this.triggerToast({
+            message: error.error,
+            color: 'error',
+          })
         } finally {
           this.isLoading = false
         }
@@ -90,9 +96,6 @@ export default {
     },
   },
   computed: {
-    messageType() {
-      return this.status === 200 ? 'success' : 'error'
-    },
     buttonText() {
       return this.isLoading ? 'Registering...' : 'Register'
     },
@@ -166,9 +169,6 @@ export default {
       </p>
     </div>
     <div style="text-align: center">
-      <div v-if="message" :class="['status-alert', messageType]">
-        <p class="status-text">{{ message }}</p>
-      </div>
       <button type="submit" :disabled="isLoading" class="btn">
         {{ buttonText }}
       </button>

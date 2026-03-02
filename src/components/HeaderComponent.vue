@@ -38,6 +38,7 @@ export default {
   methods: {
     ...mapActions('cart', ['fetchCart']),
     ...mapActions('user', ['fetchUser']),
+    ...mapActions('toast', ['triggerToast']),
     toggleProfileMenu() {
       this.profileActive = !this.profileActive
 
@@ -49,9 +50,22 @@ export default {
       if (this.profileActive) this.profileActive = false
     },
     async logout() {
-      await axiosInstance.get('/logout.php')
-      Cookies.remove('token')
-      this.$router.push('/login')
+      try {
+        await axiosInstance.get('/logout.php')
+        this.triggerToast({
+          message: 'Logout success',
+          color: 'success',
+        })
+        Cookies.remove('token')
+        this.$router.push('/login')
+      } catch (error) {
+        console.log(error)
+
+        this.triggerToast({
+          message: error,
+          color: 'success',
+        })
+      }
     },
   },
 }
