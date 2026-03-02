@@ -1,10 +1,16 @@
 <script>
 import axiosInstance from '@/axiosInstance'
+import PaginationComponent from './PaginationComponent.vue'
 
 export default {
   async created() {
     await this.fetchOrders()
   },
+
+  components: {
+    PaginationComponent,
+  },
+
   data() {
     return {
       orders: [],
@@ -41,7 +47,6 @@ export default {
         this.orders = resp.data.orders
         this.totalOrders = resp.data.total_orders
         this.currentPage = resp.data.current_page
-        console.log(this.orders)
       } catch (error) {
         console.log(error)
       } finally {
@@ -86,6 +91,13 @@ export default {
         </div>
       </div>
     </div>
+    <PaginationComponent
+      v-if="!isUpdating"
+      :total-products="totalOrders"
+      :limit="limit"
+      @fetch-data="fetchOrders"
+      :current-page="currentPage"
+    />
   </div>
 
   <div v-else-if="!isFetching && !isUpdating" class="status-container">
