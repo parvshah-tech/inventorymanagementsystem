@@ -26,6 +26,13 @@ export default {
     ...mapGetters('user', {
       avatar: 'avatarLetter',
     }),
+    isHome() {
+      if (this.$route.name === 'orders') {
+        return false
+      } else {
+        return true
+      }
+    },
   },
 
   methods: {
@@ -77,7 +84,8 @@ export default {
           <div v-if="profileActive" class="dropdown-content">
             <a href="/profile">Update Profile</a>
             <div class="divider"></div>
-            <a href="/orders">View Orders</a>
+            <a href="/orders" v-if="isHome">View Orders</a>
+            <a href="/" v-else>View Products</a>
             <div class="divider"></div>
             <a @click="logout" class="logout-link">Logout</a>
           </div>
