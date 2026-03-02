@@ -52,6 +52,15 @@ export default {
   },
   watch: {
     async sortValue() {
+      this.sortDir = 0
+      await this.$router.push({
+        query: {
+          page: 1,
+        },
+      })
+      await this.fetchOrders(true)
+    },
+    async limit() {
       await this.$router.push({
         query: {
           page: 1,
@@ -62,7 +71,10 @@ export default {
   },
   methods: {
     async fetchOrders(pagination = false) {
+      this.selectedOrderId = null
+
       const page = this.$route.query?.page ?? 1
+      const newLimit = this.limit < 1 ? 3 : this.limit
       const sort = this.sortValue === '' ? 'placed_at' : this.sortValue
       const sortDir = this.sortDir === 1 ? 'DESC' : 'ASC'
 
@@ -73,7 +85,7 @@ export default {
           this.isUpdating = true
         }
         const resp = await axiosInstance.get(
-          `/checkout.php?pn=${page}&sort=${sort}&sort_dir=${sortDir}`,
+          `/checkout.php?pn=${page}&limit=${newLimit}&sort=${sort}&sort_dir=${sortDir}`,
         )
         this.orders = resp.data.orders
         this.totalOrders = resp.data.total_orders
@@ -107,7 +119,6 @@ export default {
 
       <div class="sort-wrapper">
         <div class="sort-controls">
-          <!-- Sort Direction Toggle -->
           <button
             v-if="sortValue"
             class="direction-btn"
@@ -117,7 +128,6 @@ export default {
             <span class="arrow" :class="{ 'is-up': !sortDir }">↓</span>
           </button>
 
-          <!-- Custom Select -->
           <div class="select-container">
             <select name="sort" id="sort" v-model="sortValue">
               <option value="">Sort By</option>

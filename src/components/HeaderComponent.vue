@@ -6,8 +6,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   async created() {
-    await this.fetchCart()
-    await this.fetchUser()
+    await Promise.all([this.fetchCart(), this.fetchUser()])
   },
   components: {
     CartComponent,
