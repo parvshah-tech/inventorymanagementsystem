@@ -175,6 +175,14 @@ export default {
             </div>
             <div class="product-total">₹{{ product.total_price }}</div>
           </div>
+          <div class="address-section">
+            <div class="address-header">
+              <span class="address-label">Delivering to</span>
+            </div>
+            <div class="address-content">
+              {{ order.address }}
+            </div>
+          </div>
         </div>
       </Transition>
     </div>
@@ -409,6 +417,36 @@ select#sort option {
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+.address-section {
+  margin: 15px 0;
+  padding: 15px 20px;
+  background-color: hsla(160, 30%, 98%, 1);
+  border-radius: 12px;
+  border: 1px solid hsla(160, 30%, 94%, 1);
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.address-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: hsla(160, 40%, 15%, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.address-content {
+  font-size: 14px;
+  line-height: 1.5;
+  color: hsla(160, 40%, 15%, 0.8);
+  font-weight: 500;
 }
 
 .message {
