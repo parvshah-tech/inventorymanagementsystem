@@ -1,3 +1,29 @@
+<script setup>
+const beforeEnter = (el) => {
+  el.style.height = '0'
+  el.style.opacity = '0'
+}
+
+const enter = (el) => {
+  el.style.height = el.scrollHeight + 'px'
+  el.style.opacity = '1'
+}
+
+const afterEnter = (el) => {
+  el.style.height = 'auto'
+}
+
+const beforeLeave = (el) => {
+  el.style.height = el.scrollHeight + 'px'
+  el.offsetHeight
+}
+
+const leave = (el) => {
+  el.style.height = '0'
+  el.style.opacity = '0'
+}
+</script>
+
 <script>
 import axiosInstance from '@/axiosInstance'
 import PaginationComponent from './PaginationComponent.vue'
@@ -14,6 +40,7 @@ export default {
   data() {
     return {
       orders: [],
+      selectedOrderId: null,
       totalOrders: 0,
       limit: 10,
       currentPage: 1,
@@ -54,6 +81,9 @@ export default {
         this.isUpdating = false
       }
     },
+    toggleOrder(id) {
+      this.selectedOrderId = this.selectedOrderId === id ? null : id
+    },
   },
 }
 </script>
@@ -67,7 +97,11 @@ export default {
     <h1 class="page-title">Your Order History</h1>
 
     <div v-for="order in orders" :key="order.order_id" class="order-main-card">
-      <div class="order-header">
+      <div
+        class="order-header"
+        @click="toggleOrder(order.order_id)"
+        :class="{ 'is-active': selectedOrderId === order.order_id }"
+      >
         <div class="header-left">
           <span class="order-label">Order ID</span>
           <h2 class="order-id">#{{ order.order_id }}</h2>
@@ -78,18 +112,28 @@ export default {
             {{ order.order_status }}
           </span>
           <h4 class="grand-total">₹{{ order.total_bill }}</h4>
+          <span class="chevron" :class="{ rotate: selectedOrderId === order.order_id }">▼</span>
         </div>
       </div>
 
-      <div class="product-list">
-        <div v-for="product in order.products" :key="product.pid" class="product-item">
-          <div class="product-info">
-            <h3 class="product-name">{{ product.pname }}</h3>
-            <p class="product-meta">₹{{ product.price }} × {{ product.quantity }}</p>
+      <Transition
+        name="expand"
+        @before-enter="beforeEnter"
+        @enter="enter"
+        @after-enter="afterEnter"
+        @before-leave="beforeLeave"
+        @leave="leave"
+      >
+        <div v-show="selectedOrderId === order.order_id" class="product-list">
+          <div v-for="product in order.products" :key="product.pid" class="product-item">
+            <div class="product-info">
+              <h3 class="product-name">{{ product.pname }}</h3>
+              <p class="product-meta">₹{{ product.price }} × {{ product.quantity }}</p>
+            </div>
+            <div class="product-total">₹{{ product.total_price }}</div>
           </div>
-          <div class="product-total">₹{{ product.total_price }}</div>
         </div>
-      </div>
+      </Transition>
     </div>
     <PaginationComponent
       v-if="!isUpdating"
@@ -258,5 +302,57 @@ export default {
 .shop-now-btn:hover {
   transform: scale(1.05);
   background: hsla(160, 100%, 30%, 1);
+}
+
+.order-header {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.order-header:hover {
+  background: hsla(160, 30%, 96%, 1);
+}
+
+.order-header.is-active {
+  background: hsla(160, 30%, 96%, 1);
+  border-bottom-color: hsla(160, 30%, 90%, 1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.chevron {
+  font-size: 10px;
+  color: #888;
+  transition: transform 0.3s ease;
+  margin-left: 10px;
+}
+
+.chevron.rotate {
+  transform: rotate(180deg);
+  color: hsla(160, 100%, 37%, 1);
+}
+
+.expand-enter-active,
+.expand-leave-active {
+  transition:
+    height 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.5s ease;
+  overflow: hidden;
+}
+
+.product-list {
+  padding: 0 25px;
+}
+
+.product-item:first-child {
+  padding-top: 15px;
+}
+.product-item:last-child {
+  padding-bottom: 15px;
 }
 </style>
