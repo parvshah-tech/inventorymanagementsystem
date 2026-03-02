@@ -1,7 +1,7 @@
 <script>
 import axiosInstance from '@/axiosInstance'
 import PaginationComponent from './PaginationComponent.vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   components: {
@@ -43,6 +43,12 @@ export default {
 
   async created() {
     await this.fetchProducts()
+  },
+
+  computed: {
+    ...mapState('cart', {
+      isUpdatingCart: 'isLoading',
+    }),
   },
 
   methods: {
@@ -156,7 +162,13 @@ export default {
             <td>₹{{ item.price }}</td>
             <td>{{ item.category }}</td>
             <td style="border: none">
-              <button class="add-to-cart-btn" @click="addToCart(item.pid, 1)">Add to cart</button>
+              <button
+                class="add-to-cart-btn"
+                @click="addToCart(item.pid, 1)"
+                :disabled="isUpdatingCart"
+              >
+                Add to cart
+              </button>
             </td>
           </tr>
         </tbody>
