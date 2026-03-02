@@ -15,6 +15,7 @@ export default {
   },
   methods: {
     ...mapActions('order', ['placeOrder']),
+    ...mapActions('toast', ['triggerToast']),
     async checkout() {
       this.error = ''
       if (this.address === '' || !this.address) {
@@ -27,10 +28,16 @@ export default {
         }
         const resp = this.placeOrder(payload)
         if (!resp.error) {
-          console.log('Order placed')
+          this.triggerToast({
+            message: 'Order placed',
+            color: 'success',
+          })
           this.$router.push('/')
         } else {
-          console.log(resp.error)
+          this.triggerToast({
+            message: resp.error,
+            color: 'error',
+          })
         }
         this.address = ''
       }

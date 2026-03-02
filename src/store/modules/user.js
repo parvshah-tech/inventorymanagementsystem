@@ -49,6 +49,10 @@ const actions = {
       return resp.data
     } catch (error) {
       console.log(error)
+      this.triggerToast({
+        message: error.error,
+        color: 'error',
+      })
       return false
     }
   },

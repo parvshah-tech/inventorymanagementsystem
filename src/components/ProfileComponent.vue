@@ -22,8 +22,6 @@ export default {
         lname: '',
         phone: '',
       },
-      message: '',
-      messageType: '',
       isLoading: false,
       isEditing: false,
     }
@@ -44,6 +42,7 @@ export default {
   },
   methods: {
     ...mapActions('user', ['fetchUser', 'updateUser']),
+    ...mapActions('toast', ['triggerToast']),
     validate() {
       let isValid = true
 
@@ -67,8 +66,6 @@ export default {
     },
     toggleEdit() {
       this.isEditing = !this.isEditing
-      this.message = ''
-      this.messageType = ''
     },
     cancel() {
       this.error = {}
@@ -84,14 +81,26 @@ export default {
           lname: this.user.lname,
           phone: this.user.phone,
         }
-        const resp = await this.updateUser(payload)
-        if (resp.message) {
-          this.message = resp.message
-          this.messageType = 'success'
-          this.cancel()
-        } else {
-          this.message = resp.error ?? ''
-          this.messageType = 'error'
+        try {
+          const resp = await this.updateUser(payload)
+          if (resp.message) {
+            this.cancel()
+            this.triggerToast({
+              message: resp.message,
+              color: 'success',
+            })
+          } else {
+            this.triggerToast({
+              message: resp.error,
+              color: 'error',
+            })
+          }
+        } catch (error) {
+          console.log(error)
+          this.triggerToast({
+            message: error,
+            color: 'error',
+          })
         }
       }
     },
@@ -171,9 +180,6 @@ export default {
       </div>
 
       <div class="form-footer">
-        <div v-if="message" :class="['status-alert', messageType]">
-          <p class="status-text">{{ message }}</p>
-        </div>
         <div v-if="isEditing" class="button-group">
           <button type="button" class="btn-cancel" @click="cancel">Cancel</button>
           <button type="submit" class="btn-save" :disabled="checkChanges">Save Changes</button>
@@ -298,17 +304,10 @@ export default {
 }
 
 .field-error {
-  font-size: 11px;
+  font-size: 12px;
   color: hsla(0, 100%, 45%, 1);
   font-weight: 500;
   margin: 0;
-}
-
-.field-error {
-  font-size: 12px;
-  margin-top: 5px;
-  display: block;
-  color: red;
 }
 
 input {
@@ -343,34 +342,6 @@ input.editing-mode:focus {
   margin-top: 35px;
   padding-top: 25px;
   border-top: 1px solid hsla(160, 30%, 94%, 1);
-}
-
-.status-alert {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  border-left: 4px solid transparent;
-}
-
-.status-text {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.status-alert.success {
-  background-color: hsla(160, 100%, 37%, 0.1);
-  color: hsla(160, 100%, 25%, 1);
-  border-left-color: hsla(160, 100%, 37%, 1);
-}
-
-.status-alert.error {
-  background-color: hsla(0, 100%, 45%, 0.05);
-  color: hsla(0, 100%, 45%, 1);
-  border-left-color: hsla(0, 100%, 45%, 1);
 }
 
 .button-group {

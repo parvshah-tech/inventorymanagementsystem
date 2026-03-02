@@ -21,25 +21,41 @@ export default {
   },
   methods: {
     ...mapActions('cart', ['fetchCart', 'updateCartProduct', 'clearCart', 'deleteCartProduct']),
+    ...mapActions('toast', ['triggerToast']),
     async update(pid, quantity) {
       const payload = {
         pid: pid,
         quantity: quantity,
       }
       if (await this.updateCartProduct(payload)) {
-        console.log('Updated')
+        this.triggerToast({
+          message: 'Updated the item',
+          color: 'info',
+          timeout: 500,
+        })
       }
     },
     async deleteProduct(pid) {
       const resp = await this.deleteCartProduct(pid)
       if (resp.message) {
-        console.log('Deleted')
+        this.triggerToast({
+          message: 'Deleted the item',
+          color: 'info',
+          timeout: 500,
+        })
       } else {
-        console.log(resp)
+        this.triggerToast({
+          message: resp.error,
+          color: 'error',
+        })
       }
     },
     async clear() {
       await this.clearCart()
+      this.triggerToast({
+        message: 'Cart cleared',
+        color: 'success',
+      })
       this.$emit('closeCart')
     },
     checkout() {
@@ -152,11 +168,6 @@ export default {
   margin-bottom: 12px;
 }
 
-.item-info {
-  flex: 1;
-  padding: 0 16px;
-}
-
 .item-name {
   font-size: 16px;
   font-weight: 600;
@@ -167,14 +178,6 @@ export default {
 .item-price {
   color: hsla(160, 100%, 37%, 1);
   font-weight: 700;
-}
-
-.quantity-control {
-  display: flex;
-  align-items: center;
-  border: 1px solid hsla(160, 30%, 90%, 1);
-  border-radius: 20px;
-  overflow: hidden;
 }
 
 .qty-btn {
