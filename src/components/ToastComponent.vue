@@ -21,7 +21,7 @@ export default {
 .toast {
   min-width: 250px;
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   right: -64px;
   transform: translateX(-50%);
   padding: 15px;
