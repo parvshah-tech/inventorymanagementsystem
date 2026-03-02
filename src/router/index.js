@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Cookies from 'js-cookie'
+import NotFoundComponent from '@/components/NotFoundComponent.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +35,11 @@ const router = createRouter({
       path: '/orders',
       name: 'orders',
       component: () => import('@/views/OrdersView.vue'),
+    },
+    {
+      path: '/:pathmatch(.*)*',
+      name: 'NotFound',
+      component: NotFoundComponent,
     },
   ],
 })
