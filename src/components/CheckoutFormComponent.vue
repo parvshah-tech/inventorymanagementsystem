@@ -18,7 +18,7 @@ export default {
     ...mapActions('toast', ['triggerToast']),
     async checkout() {
       this.error = ''
-      if (this.address === '' || !this.address) {
+      if (this.address.trim() === '' || !this.address) {
         this.error = 'Address required'
       } else if (this.address.length < 10) {
         this.error = 'Address length must be greater than 10'

@@ -182,7 +182,18 @@ export default {
       <div class="form-footer">
         <div v-if="isEditing" class="button-group">
           <button type="button" class="btn-cancel" @click="cancel">Cancel</button>
-          <button type="submit" class="btn-save" :disabled="checkChanges">Save Changes</button>
+          <button
+            type="submit"
+            class="btn-save"
+            :disabled="checkChanges"
+            :style="{
+              backgroundColor: checkChanges ? '#f1f3f5' : '',
+              color: checkChanges ? '#495057' : '',
+              cursor: checkChanges ? 'not-allowed' : '',
+            }"
+          >
+            Save Changes
+          </button>
         </div>
         <div v-else>
           <button type="button" class="btn-edit" @click="toggleEdit">Edit Profile</button>
