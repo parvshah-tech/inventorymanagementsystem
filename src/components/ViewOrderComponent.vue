@@ -15,7 +15,6 @@ const afterEnter = (el) => {
 
 const beforeLeave = (el) => {
   el.style.height = el.scrollHeight + 'px'
-  el.offsetHeight
 }
 
 const leave = (el) => {
@@ -42,27 +41,30 @@ export default {
       orders: [],
       selectedOrderId: null,
       totalOrders: 0,
-      limit: 10,
+      limit: 3,
       currentPage: 1,
+      sortValue: '',
+      sortDir: 0,
       error: '',
       isFetching: false,
       isUpdating: false,
     }
   },
   watch: {
-    async limit() {
+    async sortValue() {
       await this.$router.push({
         query: {
           page: 1,
         },
       })
-      await this.fetchOrders()
+      await this.fetchOrders(true)
     },
   },
   methods: {
     async fetchOrders(pagination = false) {
       const page = this.$route.query?.page ?? 1
-      const newLimit = this.limit !== 0 ? '&limit=' + this.limit : ''
+      const sort = this.sortValue === '' ? 'placed_at' : this.sortValue
+      const sortDir = this.sortDir === 1 ? 'DESC' : 'ASC'
 
       try {
         if (!pagination && !this.isUpdating) {
@@ -70,7 +72,9 @@ export default {
         } else {
           this.isUpdating = true
         }
-        const resp = await axiosInstance.get(`/checkout.php?pn=${page}${newLimit}`)
+        const resp = await axiosInstance.get(
+          `/checkout.php?pn=${page}&sort=${sort}&sort_dir=${sortDir}`,
+        )
         this.orders = resp.data.orders
         this.totalOrders = resp.data.total_orders
         this.currentPage = resp.data.current_page
@@ -84,6 +88,10 @@ export default {
     toggleOrder(id) {
       this.selectedOrderId = this.selectedOrderId === id ? null : id
     },
+    async toggleSort() {
+      this.sortDir = Number(!this.sortDir)
+      await this.fetchOrders(true)
+    },
   },
 }
 </script>
@@ -94,7 +102,32 @@ export default {
   </div>
 
   <div v-else-if="orders?.length > 0" class="orders-wrapper">
-    <h1 class="page-title">Your Order History</h1>
+    <div class="header">
+      <h1 class="page-title">Order History</h1>
+
+      <div class="sort-wrapper">
+        <div class="sort-controls">
+          <!-- Sort Direction Toggle -->
+          <button
+            v-if="sortValue"
+            class="direction-btn"
+            @click="toggleSort"
+            :title="sortDir ? 'Descending' : 'Ascending'"
+          >
+            <span class="arrow" :class="{ 'is-up': !sortDir }">↓</span>
+          </button>
+
+          <!-- Custom Select -->
+          <div class="select-container">
+            <select name="sort" id="sort" v-model="sortValue">
+              <option value="">Sort By</option>
+              <option value="order_id">Order ID</option>
+              <option value="total_bill">Total Bill</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div v-for="order in orders" :key="order.order_id" class="order-main-card">
       <div
@@ -157,11 +190,97 @@ export default {
   padding: 20px;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
 .page-title {
   color: hsla(160, 40%, 15%, 1);
   font-size: 24px;
-  margin-bottom: 30px;
   font-weight: 800;
+  margin: 0;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 2px solid hsla(160, 100%, 37%, 0.2);
+  border-radius: 12px;
+  padding: 4px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.sort-controls:focus-within {
+  border-color: hsla(160, 100%, 37%, 1);
+  box-shadow: 0 0 0 4px hsla(160, 100%, 37%, 0.1);
+}
+
+.direction-btn {
+  background: hsla(160, 100%, 37%, 0.1);
+  border: none;
+  color: hsla(160, 100%, 25%, 1);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 4px;
+}
+
+.direction-btn:hover {
+  background: hsla(160, 100%, 37%, 0.2);
+}
+
+.direction-btn .arrow {
+  font-size: 18px;
+  font-weight: bold;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.direction-btn .arrow.is-up {
+  transform: rotate(180deg);
+}
+
+.select-container {
+  position: relative;
+}
+
+select#sort {
+  padding: 8px 30px 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: hsla(160, 40%, 15%, 1);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+}
+
+.select-container::after {
+  content: '▾';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: hsla(160, 100%, 37%, 1);
+  font-size: 12px;
+}
+
+select#sort option {
+  background-color: white;
+  color: hsla(160, 40%, 15%, 1);
 }
 
 .order-main-card {

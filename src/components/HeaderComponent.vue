@@ -5,9 +5,9 @@ import CartComponent from './CartComponent.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
-  created() {
-    this.fetchCart()
-    this.fetchUser()
+  async created() {
+    await this.fetchCart()
+    await this.fetchUser()
   },
   components: {
     CartComponent,
