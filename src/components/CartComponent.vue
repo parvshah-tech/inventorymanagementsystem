@@ -31,7 +31,7 @@ export default {
         this.triggerToast({
           message: 'Updated the item',
           color: 'info',
-          timeout: 800,
+          timeout: 500,
         })
       }
     },
@@ -41,7 +41,7 @@ export default {
         this.triggerToast({
           message: 'Deleted the item',
           color: 'info',
-          timeout: 800,
+          timeout: 500,
         })
       } else {
         this.triggerToast({

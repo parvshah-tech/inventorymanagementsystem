@@ -19,9 +19,10 @@ export default {
 
 <style scoped>
 .toast {
+  min-width: 250px;
   position: fixed;
   bottom: 20px;
-  right: 0;
+  right: -64px;
   transform: translateX(-50%);
   padding: 15px;
   border-radius: 5px;

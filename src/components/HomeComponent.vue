@@ -98,7 +98,7 @@ export default {
         this.triggerToast({
           message: 'Added to cart',
           color: 'success',
-          timeout: 800,
+          timeout: 500,
         })
       }
     },
