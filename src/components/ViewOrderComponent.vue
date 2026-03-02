@@ -52,6 +52,7 @@ export default {
   },
   watch: {
     async sortValue() {
+      this.sortDir = 0
       await this.$router.push({
         query: {
           page: 1,
@@ -70,6 +71,8 @@ export default {
   },
   methods: {
     async fetchOrders(pagination = false) {
+      this.selectedOrderId = null
+
       const page = this.$route.query?.page ?? 1
       const newLimit = this.limit < 1 ? 3 : this.limit
       const sort = this.sortValue === '' ? 'placed_at' : this.sortValue
@@ -116,7 +119,6 @@ export default {
 
       <div class="sort-wrapper">
         <div class="sort-controls">
-          <!-- Sort Direction Toggle -->
           <button
             v-if="sortValue"
             class="direction-btn"
@@ -126,7 +128,6 @@ export default {
             <span class="arrow" :class="{ 'is-up': !sortDir }">↓</span>
           </button>
 
-          <!-- Custom Select -->
           <div class="select-container">
             <select name="sort" id="sort" v-model="sortValue">
               <option value="">Sort By</option>
