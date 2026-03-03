@@ -522,4 +522,10 @@ select#sort option {
 .product-item:last-child {
   padding-bottom: 15px;
 }
+
+@media only screen and (max-width: 425px) {
+  .page-title {
+    font-size: 18px;
+  }
+}
 </style>

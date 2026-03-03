@@ -297,6 +297,14 @@ export default {
 }
 
 @media only screen and (max-width: 425px) {
+  .btn-group {
+    margin-right: 0;
+  }
+  .cart-btn,
+  .profile-btn {
+    height: 50px;
+    width: 50px;
+  }
   .cart-content {
     right: -84px;
     min-width: 300px;

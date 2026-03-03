@@ -372,4 +372,13 @@ tbody h1 {
     justify-content: center;
   }
 }
+
+@media only screen and (max-width: 320px) {
+  .option-container {
+    justify-content: stretch;
+  }
+  .product-grid {
+    margin: 0;
+  }
+}
 </style>
