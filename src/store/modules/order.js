@@ -35,7 +35,7 @@ const actions = {
       commit('setLoading', false)
     }
   },
-  async placeOrder(payload) {
+  async placeOrder({ dispatch, state }, payload) {
     try {
       const resp = await axiosInstance.post('/checkout.php', payload)
       return resp.data

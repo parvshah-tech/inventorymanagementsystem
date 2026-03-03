@@ -26,7 +26,8 @@ export default {
         const payload = {
           address: this.address,
         }
-        const resp = this.placeOrder(payload)
+        const resp = await this.placeOrder(payload)
+
         if (!resp.error) {
           this.triggerToast({
             message: 'Order placed',
