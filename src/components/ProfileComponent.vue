@@ -403,4 +403,12 @@ button {
 .btn-cancel:hover {
   background: #e9ecef;
 }
+
+@media only screen and (max-width: 425px) {
+  .profile-container {
+    margin: 0;
+    padding: 10px 20px;
+    border-radius: 0;
+  }
+}
 </style>
