@@ -11,10 +11,10 @@ const state = () => ({
 })
 
 const getters = {
-  fullName: (state, getters) => {
+  fullName: (state) => {
     return state.fname + ' ' + state.lname
   },
-  avatarLetter: (state, getters) => {
+  avatarLetter: (state) => {
     return state.fname[0]
   },
 }
@@ -42,7 +42,7 @@ const actions = {
       commit('setError', error)
     }
   },
-  async updateUser({ dispatch, state }, payload) {
+  async updateUser({ dispatch }, payload) {
     try {
       const resp = await axiosInstance.post('/update_profile.php', payload)
       await dispatch('fetchUser')
@@ -50,7 +50,7 @@ const actions = {
     } catch (error) {
       console.log(error)
       this.triggerToast({
-        message: error.error,
+        message: 'Network Error, please try again',
         color: 'error',
       })
       return false
