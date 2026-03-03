@@ -35,14 +35,14 @@ const actions = {
       commit('setLoading', false)
     }
   },
-  async placeOrder({ dispatch, state }, payload) {
+  async placeOrder(payload) {
     try {
       const resp = await axiosInstance.post('/checkout.php', payload)
       return resp.data
     } catch (error) {
       console.log(error)
       this.triggerToast({
-        message: error.error,
+        message: 'Network Error, please try again',
         color: 'error',
       })
       return error

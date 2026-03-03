@@ -98,7 +98,7 @@ export default {
         } catch (error) {
           console.log(error)
           this.triggerToast({
-            message: error,
+            message: 'Network Error, please try again',
             color: 'error',
           })
         }
