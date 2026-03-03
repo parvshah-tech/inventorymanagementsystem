@@ -104,82 +104,90 @@ export default {
 </script>
 
 <template>
-  <h1 style="text-align: center">Welcome to IMS</h1>
-  <form @submit.prevent="register">
-    <div class="name-group">
+  <div class="auth-container">
+    <h1 style="text-align: center">Welcome to Shopazon</h1>
+    <form @submit.prevent="register">
+      <div class="name-group">
+        <div class="form-group">
+          <label for="fname">
+            <span style="color: red">*</span>
+            First Name:
+          </label>
+          <input type="text" v-model="user.fname" id="fname" />
+          <p class="field-error" v-if="error.fname !== ''">
+            {{ error.fname }}
+          </p>
+        </div>
+        <div class="form-group">
+          <label for="lname">
+            <span style="color: red">*</span>
+            Last Name:
+          </label>
+          <input type="text" v-model="user.lname" id="lname" />
+          <p class="field-error" v-if="error.lname !== ''">
+            {{ error.lname }}
+          </p>
+        </div>
+      </div>
       <div class="form-group">
-        <label for="fname">
+        <label for="email">
           <span style="color: red">*</span>
-          First Name:
+          Email:
         </label>
-        <input type="text" v-model="user.fname" id="fname" />
-        <p class="field-error" v-if="error.fname !== ''">
-          {{ error.fname }}
+        <input type="email" v-model="user.email" id="email" />
+        <p class="field-error" v-if="error.email !== ''">
+          {{ error.email }}
         </p>
       </div>
       <div class="form-group">
-        <label for="lname">
+        <label for="phone">
           <span style="color: red">*</span>
-          Last Name:
+          Phone:
         </label>
-        <input type="text" v-model="user.lname" id="lname" />
-        <p class="field-error" v-if="error.lname !== ''">
-          {{ error.lname }}
+        <input type="tel" v-model="user.phone" id="phone" />
+        <p class="field-error" v-if="error.phone !== ''">
+          {{ error.phone }}
         </p>
       </div>
-    </div>
-    <div class="form-group">
-      <label for="email">
-        <span style="color: red">*</span>
-        Email:
-      </label>
-      <input type="email" v-model="user.email" id="email" />
-      <p class="field-error" v-if="error.email !== ''">
-        {{ error.email }}
-      </p>
-    </div>
-    <div class="form-group">
-      <label for="phone">
-        <span style="color: red">*</span>
-        Phone:
-      </label>
-      <input type="tel" v-model="user.phone" id="phone" />
-      <p class="field-error" v-if="error.phone !== ''">
-        {{ error.phone }}
-      </p>
-    </div>
-    <div class="form-group">
-      <label for="pwd">
-        <span style="color: red">*</span>
-        Password:
-      </label>
-      <input type="password" v-model="user.pwd" id="pwd" />
-      <p class="field-error" v-if="error.pwd !== ''">
-        {{ error.pwd }}
-      </p>
-    </div>
-    <div class="form-group">
-      <label for="confirm_pwd">
-        <span style="color: red">*</span>
-        Confirm Password:
-      </label>
-      <input type="password" v-model="user.confirm_pwd" id="confirm_pwd" />
-      <p class="field-error" v-if="error.confirm_pwd !== ''">
-        {{ error.confirm_pwd }}
-      </p>
-    </div>
-    <div style="text-align: center">
-      <button type="submit" :disabled="isLoading" class="btn">
-        {{ buttonText }}
-      </button>
-      <p>Already have an account, <RouterLink to="/login">Login</RouterLink></p>
-    </div>
-  </form>
+      <div class="form-group">
+        <label for="pwd">
+          <span style="color: red">*</span>
+          Password:
+        </label>
+        <input type="password" v-model="user.pwd" id="pwd" />
+        <p class="field-error" v-if="error.pwd !== ''">
+          {{ error.pwd }}
+        </p>
+      </div>
+      <div class="form-group">
+        <label for="confirm_pwd">
+          <span style="color: red">*</span>
+          Confirm Password:
+        </label>
+        <input type="password" v-model="user.confirm_pwd" id="confirm_pwd" />
+        <p class="field-error" v-if="error.confirm_pwd !== ''">
+          {{ error.confirm_pwd }}
+        </p>
+      </div>
+      <div style="text-align: center">
+        <button type="submit" :disabled="isLoading" class="btn">
+          {{ buttonText }}
+        </button>
+        <p>Already have an account, <RouterLink to="/login">Login</RouterLink></p>
+      </div>
+    </form>
+  </div>
 </template>
 
 <style scoped>
 .name-group {
   display: flex;
   justify-content: space-between;
+}
+
+@media only screen and (max-width: 425px) {
+  .name-group {
+    flex-direction: column;
+  }
 }
 </style>

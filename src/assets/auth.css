@@ -1,3 +1,9 @@
+.auth-container {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
 form {
   margin-top: 18px;
 }

@@ -79,7 +79,6 @@ export default {
       <div v-for="product in cartProducts" class="cart-item" :key="product.pid">
         <div class="item-details">
           <h4 class="item-name">{{ product.pname }}</h4>
-          <p class="item-category">{{ product.category }}</p>
           <span class="item-price">₹{{ product.price }}</span>
         </div>
 
@@ -264,5 +263,31 @@ export default {
   border: 1px solid hsla(160, 100%, 37%, 1);
   box-shadow: 0px 4px 12px hsla(160, 100%, 37%, 0.2);
   transform: translateY(-3px) scale(1.05);
+}
+
+@media only screen and (max-width: 425px) {
+  .cart-header > h1 {
+    font-size: 24px;
+  }
+  .cart-clear-btn,
+  .checkout-btn {
+    font-size: 16px;
+  }
+  .item-name {
+    font-size: 14px;
+  }
+  .qty-btn {
+    margin: 0 6px;
+    font-size: 18px;
+    padding: 0;
+  }
+  .total-price {
+    font-size: 16px;
+  }
+  .remove-item-btn {
+    height: 30px;
+    width: 30px;
+    padding: 2px 3px;
+  }
 }
 </style>
