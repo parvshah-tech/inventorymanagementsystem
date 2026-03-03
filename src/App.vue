@@ -10,10 +10,9 @@ import ToastComponent from './components/ToastComponent.vue'
 
 <style>
 .container {
-  max-width: 500px;
+  width: 100%;
+  min-width: 500px;
   background-color: hsla(160, 30%, 96%, 1);
-  margin: 0 auto;
-  margin-top: 32px;
   padding: 18px;
   border-radius: 15px;
 }
@@ -24,5 +23,19 @@ import ToastComponent from './components/ToastComponent.vue'
   align-items: center;
   height: 100vh;
   width: 100vw;
+}
+
+@media only screen and (max-width: 425px) {
+  .container {
+    margin-top: 25px;
+    min-width: 400px;
+  }
+}
+
+@media only screen and (max-width: 375px) {
+  .container {
+    margin-top: 25px;
+    min-width: 300px;
+  }
 }
 </style>

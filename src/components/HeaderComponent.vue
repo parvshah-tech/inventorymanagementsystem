@@ -274,7 +274,7 @@ export default {
   padding-top: 0;
   display: block;
   position: absolute;
-  right: 0;
+  right: -64px;
   min-width: 600px;
   background-color: hsla(160, 30%, 96%, 1);
   border-radius: 15px;
@@ -294,5 +294,12 @@ export default {
 }
 .cart-content::-webkit-scrollbar-thumb:hover {
   background: hsla(160, 100%, 37%, 0.5);
+}
+
+@media only screen and (max-width: 425px) {
+  .cart-content {
+    right: -84px;
+    min-width: 300px;
+  }
 }
 </style>

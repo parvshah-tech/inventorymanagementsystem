@@ -11,7 +11,7 @@ export default {
     return {
       products: [],
       totalProducts: 0,
-      limit: 10,
+      limit: 12,
       currentPage: 1,
       error: '',
       isFetching: false,
@@ -32,6 +32,15 @@ export default {
       await this.fetchProducts()
     },
     async limit() {
+      await this.$router.push({
+        query: {
+          page: 1,
+        },
+      })
+      await this.fetchProducts(true)
+    },
+    async sortValue() {
+      this.sortDir = 0
       await this.$router.push({
         query: {
           page: 1,
@@ -102,15 +111,9 @@ export default {
         })
       }
     },
-    async sortProducts(sortBy) {
-      if (sortBy === this.sortValue) {
-        this.desc = Number(!this.desc)
-      } else {
-        this.desc = 0
-        this.sortValue = sortBy
-      }
-
-      await this.fetchProducts()
+    async toggleSort() {
+      this.desc = Number(!this.desc)
+      await this.fetchProducts(true)
     },
   },
 }
@@ -121,56 +124,50 @@ export default {
     <h1 v-if="isFetching && !isUpdating">Loading products...</h1>
     <template v-else-if="products?.length > 0">
       <div class="option-container">
-        <select name="limit" id="limit" v-model="limit">
-          <option :value="5">5</option>
-          <option :value="10">10</option>
-          <option :value="15">15</option>
-          <option :value="20">20</option>
-          <option :value="25">25</option>
+        <select name="limit" id="limit" class="tool-select" v-model="limit">
+          <option :value="6">6 per page</option>
+          <option :value="12">12 per page</option>
+          <option :value="24">24 per page</option>
         </select>
-        <select name="filter" id="filter" v-model="filterValue">
-          <option value="">Category</option>
+
+        <div class="sort-group">
+          <button
+            v-if="sortValue"
+            class="direction-btn"
+            @click="toggleSort"
+            :title="desc ? 'Descending' : 'Ascending'"
+          >
+            <span class="arrow" :class="{ 'is-up': !desc }">↓</span>
+          </button>
+          <select name="sort" id="sort" class="tool-select sort-select" v-model="sortValue">
+            <option value="">Sort By</option>
+            <option value="pname">Name</option>
+            <option value="price">Price</option>
+          </select>
+        </div>
+
+        <select name="filter" id="filter" class="tool-select" v-model="filterValue">
+          <option value="">All Categories</option>
           <option value="games">Games</option>
           <option value="study">Study</option>
           <option value="sports">Sports</option>
         </select>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>
-              <button class="sort-btn" @click="sortProducts('pname')">
-                Name
-                <span v-if="sortValue === 'pname'">
-                  <span v-if="!desc">&uArr;</span>
-                  <span v-else>&dArr;</span>
-                </span>
-              </button>
-            </th>
-            <th>Description</th>
-            <th>
-              <button class="sort-btn" @click="sortProducts('price')">
-                Price
-                <span v-if="sortValue === 'price'">
-                  <span v-if="!desc">&uArr;</span>
-                  <span v-else>&dArr;</span>
-                </span>
-              </button>
-            </th>
-            <th>Category</th>
-            <th style="border: none"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="isUpdating">
-            <td colspan="5"><h1>Loading...</h1></td>
-          </tr>
-          <tr v-else v-for="item in products" :key="item.pid">
-            <td>{{ item.pname }}</td>
-            <td>{{ item.pdesc }}</td>
-            <td>₹{{ item.price }}</td>
-            <td>{{ item.category }}</td>
-            <td style="border: none">
+      <div class="product-grid">
+        <div v-if="isUpdating" class="loading-overlay">
+          <h1>Loading...</h1>
+        </div>
+
+        <div v-for="item in products" :key="item.pid" class="product-card">
+          <div class="card-header">
+            <h3>{{ item.pname }}</h3>
+            <span class="category-tag">{{ item.category }}</span>
+          </div>
+
+          <div class="card-body">
+            <p class="description">{{ item.pdesc }}</p>
+            <div class="price-row">
+              <span class="price">₹{{ item.price }}</span>
               <button
                 class="add-to-cart-btn"
                 @click="addToCart(item.pid, 1)"
@@ -178,10 +175,11 @@ export default {
               >
                 Add to cart
               </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <PaginationComponent
         v-if="!isUpdating"
         :total-products="totalProducts"
@@ -213,13 +211,13 @@ tbody h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 15px;
+  width: 90%;
+  margin: 0 auto 30px auto;
 }
 
-select#filter,
-select#limit {
+.tool-select {
   display: block;
-  width: fit-content;
-  margin: 0 auto 20px 5%;
   padding: 10px 15px;
   font-size: 16px;
   color: hsla(160, 100%, 20%, 1);
@@ -230,75 +228,122 @@ select#limit {
   outline: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  min-width: 120px;
 }
 
-select#filter {
-  margin: 0 5% 20px auto;
-}
-
-select#filter:focus,
-select#limit:focus {
+.tool-select:focus {
   box-shadow: 0 0 0 3px hsla(160, 100%, 37%, 0.2);
   border-color: hsla(160, 100%, 25%, 1);
 }
 
-select#filter option,
-select#limit option {
-  background-color: white;
-  color: hsla(160, 40%, 15%, 1);
-  padding: 10px;
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-table {
+.direction-btn {
+  background: hsla(160, 100%, 37%, 0.2);
+  border: none;
+  color: hsla(160, 100%, 25%, 1);
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.direction-btn:hover {
+  background: hsla(160, 100%, 25%, 1);
+  transform: scale(1.05);
+}
+
+.direction-btn .arrow {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.direction-btn .arrow.is-up {
+  transform: rotate(180deg);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
   width: 90%;
   margin: 0 auto;
-  border-collapse: collapse;
-  font-size: 18px;
+}
+
+.product-card {
   background-color: white;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.sort-btn {
-  background: none;
-  border: none;
-  color: white;
-  text-align: left;
-  font-weight: 600;
-  padding: 12px;
-  font-size: 18px;
-  cursor: pointer;
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-th {
+.card-header {
   background-color: hsla(160, 100%, 37%, 1);
+  padding: 15px;
   color: white;
-  text-align: left;
-  font-weight: 600;
-  padding: 16px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-td {
-  padding: 14px 12px;
-  border-bottom: 1px solid hsla(160, 30%, 90%, 1);
-  color: hsla(160, 40%, 15%, 1);
-}
-tr:nth-child(even) {
-  background-color: hsla(160, 100%, 98%, 1);
+.card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
 }
 
-tr:hover {
-  background-color: hsla(160, 100%, 95%, 1);
-  transition: background 0.2s ease;
+.category-tag {
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
-tr:last-child td {
-  border-bottom: none;
+.card-body {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.description {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: hsla(160, 100%, 25%, 1);
 }
 
 .add-to-cart-btn {
-  width: 50%;
   padding: 8px;
   font-size: 18px;
   font-size: 18px;
@@ -317,5 +362,14 @@ tr:last-child td {
   border: 1px solid hsla(160, 100%, 37%, 1);
   box-shadow: 0px 4px 12px hsla(160, 100%, 37%, 0.2);
   transform: translateY(-3px) scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .option-container {
+    /* flex-direction: column;
+    align-items: end; */
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 </style>
