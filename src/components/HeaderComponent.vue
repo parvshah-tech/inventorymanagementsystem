@@ -73,8 +73,7 @@ export default {
 <template>
   <header>
     <div class="container">
-      <div></div>
-      <h1>Inventory Management System</h1>
+      <h1><a href="/">Shopazon</a></h1>
       <div class="btn-group">
         <div class="cart-dropdown">
           <div class="cart-wrapper">
@@ -120,8 +119,13 @@ export default {
   align-items: center;
 }
 
-.container > h1 {
+.container > h1,
+.container a {
   color: hsla(160, 15%, 35%, 1);
+}
+
+.container a:hover {
+  background-color: transparent;
 }
 
 .btn-group {
